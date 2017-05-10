@@ -19,21 +19,27 @@ stable_protocols =								\
 	stable/viewporter/viewporter.xml					\
 	$(NULL)
 
+chromium_protocols =										\
+	chromium/linux-explicit-synchronization/linux-explicit-synchronization-unstable-v1.xml	\
+	$(NULL)
+
 nobase_dist_pkgdata_DATA =							\
 	$(unstable_protocols)							\
 	$(stable_protocols)							\
+	$(chromium_protocols)							\
 	$(NULL)
 
 dist_noinst_DATA =								\
 	$(sort $(foreach p,$(unstable_protocols),$(dir $p)README))		\
 	$(sort $(foreach p,$(stable_protocols),$(dir $p)README))		\
+	$(sort $(foreach p,$(chromium_protocols),$(dir $p)README))		\
 	$(NULL)
 
 noarch_pkgconfig_DATA = wayland-protocols.pc
 
 dist_check_SCRIPTS = tests/scan.sh
 
-TESTS = $(unstable_protocols) $(stable_protocols)
+TESTS = $(unstable_protocols) $(stable_protocols) $(chromium_protocols)
 TEST_EXTENSIONS = .xml
 AM_TESTS_ENVIRONMENT = SCANNER='$(wayland_scanner)'; export SCANNER;
 XML_LOG_COMPILER = $(srcdir)/tests/scan.sh

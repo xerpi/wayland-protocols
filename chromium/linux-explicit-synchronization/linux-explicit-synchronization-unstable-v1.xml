@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="linux_explicit_synchronization_unstable_v1">
+
+  <copyright>
+    Copyright 2016 The Chromium Authors.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice (including the next
+    paragraph) shall be included in all copies or substantial portions of the
+    Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+  </copyright>
+
+<description summary="Protocol for explicit synchronization">
+    This protocol specifies a set of interfaces used to provide explicit
+    synchronization of buffers to the the client.
+
+    Warning! The protocol described in this file is experimental and backward
+    incompatible changes may be made. Backward compatible changes may be added
+    together with the corresponding interface version bump. Backward
+    incompatible changes are done by bumping the version number in the protocol
+    and interface names and resetting the interface version. Once the protocol
+    is to be declared stable, the version number in the protocol is removed and
+    the interface version number is reset.
+  </description>
+
+  <interface name="zcr_linux_explicit_synchronization_v1" version="1">
+    <description summary="Protocol for providing explicit synchronization">
+      The global interface that allows clients to set explicit synchronization
+      fences for given wl_surface.
+    </description>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy explicit synchronization object">
+	Destroy this explicit synchronization object. Existing explicit
+	synchronization objects shall not be affected by this request.
+      </description>
+    </request>
+
+    <enum name="error">
+      <entry name="synchronization_exists" value="0"
+	     summary="the surface already has an synchronization object associated"/>
+    </enum>
+
+    <request name="get_synchronization">
+      <description summary="extend surface interface for explicit synchronization">
+	Instantiate an interface extension for the given wl_surface to
+	provide explicit synchronization. If the given wl_surface already has
+	an explicit synchronization object associated, the
+	synchronization_exists protocol error is raised.
+      </description>
+
+      <arg name="id" type="new_id" interface="zcr_synchronization_v1"
+	   summary="the new synchronization interface id"/>
+      <arg name="surface" type="object" interface="wl_surface"
+	   summary="the surface"/>
+    </request>
+  </interface>
+
+  <interface name="zcr_synchronization_v1" version="1">
+    <request name="destroy" type="destructor">
+      <description summary="destroy synchronization object">
+	Destroy this explicit synchronization object.
+      </description>
+    </request>
+
+    <enum name="error">
+      <entry name="invalid_fence" value="0"
+	     summary="the fence specified by the client could not be imported"/>
+    </enum>
+
+    <request name="set_acquire_fence">
+      <description summary="set the acquire fence">
+	Set the acquire fence that must be signaled before the compositor
+	is allowed to read the pixels in the pending wl_buffer.
+
+	The acquire state is double-buffered state, and will be applied on
+	the next wl_surface.commit.
+
+	If the fence could not be imported, an INVALID_FENCE error is signaled
+	to the client.
+      </description>
+      <arg name="fd" type="fd" summary="fence fd"/>
+    </request>
+  </interface>
+
+</protocol>
