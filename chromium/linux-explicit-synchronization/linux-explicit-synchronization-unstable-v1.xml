@@ -71,6 +71,15 @@
   </interface>
 
   <interface name="zcr_synchronization_v1" version="1">
+    <description summary="crop and scale interface to a wl_surface">
+      An additional interface to a wl_surface object, which allows the
+      client to specify an explicit synchronization object.
+
+      If the wl_surface associated with the zcr_synchronization_v1 is destroyed,
+      all zcr_synchronization_v1 requests except 'destroy' raise the protocol error
+      no_surface.
+    </description>
+
     <request name="destroy" type="destructor">
       <description summary="destroy synchronization object">
 	Destroy this explicit synchronization object.
@@ -80,6 +89,8 @@
     <enum name="error">
       <entry name="invalid_fence" value="0"
 	     summary="the fence specified by the client could not be imported"/>
+      <entry name="no_surface" value="1"
+	     summary="the wl_surface was destroyed"/>
     </enum>
 
     <request name="set_acquire_fence">
